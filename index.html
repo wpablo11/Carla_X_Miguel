@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carla & Miguel - Nuestra Boda</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Great+Vibes&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ========== HORIZONTAL SCROLL WRAPPER ========== -->
+  <div class="scroll-container">
+    <div class="scroll-track">
+
+      <!-- ===== SECTION 1: ENVELOPE ===== -->
+      <section class="panel panel-envelope" id="envelope-section">
+        <div class="envelope-wrapper">
+          <div class="envelope">
+            <!-- Envelope back -->
+            <div class="envelope-back"></div>
+
+            <!-- Letter inside -->
+            <div class="envelope-letter">
+              <div class="letter-content">
+                <img src="assets/images/placeholder.jpg" alt="Carla y Miguel" class="letter-photo">
+                <p class="letter-names">Carla & Miguel</p>
+                <p class="letter-date">XX . XX . 2025</p>
+              </div>
+            </div>
+
+            <!-- Envelope front -->
+            <div class="envelope-front">
+              <div class="envelope-text">
+                <p class="envelope-title">BODA</p>
+                <p class="envelope-names">Carla y Miguel</p>
+                <p class="envelope-year">2026</p>
+              </div>
+            </div>
+
+            <!-- Envelope flap (triangle with 3D wrapper) -->
+            <div class="envelope-flap-wrapper">
+              <div class="envelope-flap"></div>
+            </div>
+          </div>
+
+          <!-- Scroll indicator -->
+          <div class="scroll-indicator">
+            <span>Scroll para abrir</span>
+            <div class="scroll-arrow">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12l7 7 7-7"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 2: TEXT BLOCK ===== -->
+      <section class="panel panel-text" id="text-section">
+        <div class="section-inner">
+          <h1 class="text-title">Nos casamos</h1>
+          <p class="text-body">
+            Con inmensa alegría queremos compartir con vosotros
+            el día más especial de nuestras vidas. Después de años
+            de camino juntos, estamos listos para dar el siguiente paso
+            y celebrarlo rodeados de las personas que más queremos.
+          </p>
+          <p class="text-quote">"El amor no se mira el uno al otro, sino juntos en la misma dirección."</p>
+          <p class="text-author">— Antoine de Saint-Exupéry</p>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 3: DETAILS TABLE ===== -->
+      <section class="panel panel-details" id="details-section">
+        <div class="section-inner">
+          <h2 class="details-names">Carla <span>&</span> Miguel</h2>
+          <p class="details-subtitle">Os invitan a celebrar su boda</p>
+
+          <div class="details-table">
+            <div class="details-row">
+              <div class="details-icon">&#9829;</div>
+              <div class="details-label">Ceremonia</div>
+              <div class="details-value">
+                <strong>Sábado, XX de XXXX de 2025</strong><br>
+                XX:XX h
+              </div>
+            </div>
+            <div class="details-row">
+              <div class="details-icon">&#9733;</div>
+              <div class="details-label">Recepción</div>
+              <div class="details-value">
+                <strong>A continuación de la ceremonia</strong><br>
+                XX:XX h
+              </div>
+            </div>
+            <div class="details-row">
+              <div class="details-icon">&#9962;</div>
+              <div class="details-label">Lugar</div>
+              <div class="details-value">
+                <strong>Nombre del Lugar</strong><br>
+                Dirección completa, Ciudad
+              </div>
+            </div>
+            <div class="details-row">
+              <div class="details-icon">&#10047;</div>
+              <div class="details-label">Dress Code</div>
+              <div class="details-value">
+                <strong>Elegante / Formal</strong><br>
+                Colores claros preferiblemente
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 4: RSVP FORM ===== -->
+      <section class="panel panel-rsvp" id="rsvp-section">
+        <div class="section-inner">
+          <h2 class="rsvp-title">Confirma tu asistencia</h2>
+          <p class="rsvp-subtitle">Por favor, confirma antes del XX de XXXX de 2025</p>
+
+          <form id="rsvp-form" class="rsvp-form" novalidate>
+            <div class="form-group">
+              <label for="rsvp-name">Nombre completo</label>
+              <input type="text" id="rsvp-name" name="name" required placeholder="Tu nombre completo">
+              <span class="form-error" id="error-name"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="rsvp-email">Email</label>
+              <input type="email" id="rsvp-email" name="email" required placeholder="tu@email.com">
+              <span class="form-error" id="error-email"></span>
+            </div>
+
+            <div class="form-group">
+              <label>¿Asistirás?</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="attending" value="yes" required>
+                  <span class="radio-custom"></span>
+                  Sí, ¡allí estaré!
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="attending" value="no" required>
+                  <span class="radio-custom"></span>
+                  Lo siento, no podré asistir
+                </label>
+              </div>
+              <span class="form-error" id="error-attending"></span>
+            </div>
+
+            <div class="form-group form-group-guests" id="guests-group" style="display: none;">
+              <label for="rsvp-guests">Número de acompañantes</label>
+              <select id="rsvp-guests" name="guests">
+                <option value="0">Sin acompañantes</option>
+                <option value="1">1 acompañante</option>
+                <option value="2">2 acompañantes</option>
+                <option value="3">3 acompañantes</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn-submit">Enviar confirmación</button>
+          </form>
+
+          <!-- Success message -->
+          <div class="rsvp-success" id="rsvp-success" style="display: none;">
+            <div class="success-icon">&#10003;</div>
+            <h3>¡Gracias por confirmar!</h3>
+            <p class="success-message" id="success-text"></p>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /.scroll-track -->
+  </div><!-- /.scroll-container -->
+
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- Main JS -->
+  <script src="js/main.js"></script>
+</body>
+</html>
