@@ -96,43 +96,20 @@ body {
   right: 8%;
   top: 15%;
   height: 75%;
-  background: white;
+  background: none;
   border-radius: 6px;
   z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
   overflow: hidden;
-}
-
-.letter-content {
-  text-align: center;
-  padding: 1rem;
-  width: 100%;
 }
 
 .letter-photo {
   width: 100%;
-  max-width: 280px;
-  height: auto;
-  border-radius: 4px;
+  height: 100%;
+  border-radius: 6px;
   object-fit: cover;
-}
-
-.letter-names {
-  font-family: var(--ff-script);
-  font-size: clamp(1.2rem, 3vw, 1.8rem);
-  color: var(--rosa);
-  margin-top: 0.5rem;
-}
-
-.letter-date {
-  font-family: var(--ff-sans);
-  font-size: clamp(0.7rem, 1.5vw, 0.9rem);
-  color: var(--text-light);
-  letter-spacing: 3px;
-  margin-top: 0.3rem;
 }
 
 /* Envelope front — covers bottom half, hides the letter */
