@@ -10,6 +10,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Great+Vibes&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
 
+  <!-- Preload GSAP para carga más rápida -->
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" as="script" crossorigin>
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" as="script" crossorigin>
+  <link rel="preload" href="js/main.js" as="script">
+
   <!-- Styles -->
   <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -181,11 +186,39 @@
     </div><!-- /.scroll-track -->
   </div><!-- /.scroll-container -->
 
-  <!-- GSAP + ScrollTrigger -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <!-- Carga asíncrona de scripts via AJAX -->
+  <script>
+    (function() {
+      function loadScript(src) {
+        return new Promise(function(resolve, reject) {
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', src, true);
+          xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              var script = document.createElement('script');
+              script.textContent = xhr.responseText;
+              document.head.appendChild(script);
+              resolve();
+            } else {
+              reject(new Error('Error cargando ' + src));
+            }
+          };
+          xhr.onerror = function() { reject(new Error('Error de red: ' + src)); };
+          xhr.send();
+        });
+      }
 
-  <!-- Main JS -->
-  <script src="js/main.js"></script>
+      // Cargar GSAP y ScrollTrigger en paralelo, luego main.js
+      Promise.all([
+        loadScript('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js'),
+      ]).then(function() {
+        return loadScript('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js');
+      }).then(function() {
+        return loadScript('js/main.js');
+      }).catch(function(err) {
+        console.error('Error en carga de scripts:', err);
+      });
+    })();
+  </script>
 </body>
 </html>
