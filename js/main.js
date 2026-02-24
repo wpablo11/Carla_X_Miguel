@@ -26,6 +26,9 @@
   // Referencia a la animación horizontal para containerAnimation
   var horizontalAnimation = null;
 
+  // Confeti: control para evitar lanzamientos simultáneos
+  var confettiActive = false;
+
   // ------------------------------------------
   // Horizontal Scroll (Desktop only)
   // ------------------------------------------
@@ -55,6 +58,88 @@
   }
 
   // ------------------------------------------
+  // Confetti Burst
+  // ------------------------------------------
+  function launchConfetti() {
+    if (confettiActive) return;
+    confettiActive = true;
+
+    var canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;pointer-events:none;';
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    document.body.appendChild(canvas);
+
+    var ctx = canvas.getContext('2d');
+    var particles = [];
+    var colors = ['#F2D7D5', '#C9929B', '#F5E6CC', '#A8B5A2', '#d4a0aa', '#e8c8a0', '#ffffff'];
+    var numParticles = 150;
+
+    // Origen: centro de la pantalla (donde está la carta)
+    var cx = canvas.width / 2;
+    var cy = canvas.height / 2;
+
+    for (var i = 0; i < numParticles; i++) {
+      var angle = Math.random() * Math.PI * 2;
+      var speed = Math.random() * 7 + 3;
+      var size = Math.random() * 8 + 4;
+      particles.push({
+        x: cx + (Math.random() - 0.5) * 40,
+        y: cy + (Math.random() - 0.5) * 40,
+        w: size,
+        h: size * (0.4 + Math.random() * 0.4),
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 4,
+        rotation: Math.random() * 360,
+        rotationSpeed: (Math.random() - 0.5) * 14,
+        wobbleOffset: Math.random() * Math.PI * 2,
+      });
+    }
+
+    var startTime = Date.now();
+    var duration = 4000;
+    var fadeStart = 2800;
+
+    function animate() {
+      var elapsed = Date.now() - startTime;
+      if (elapsed > duration) {
+        canvas.parentNode.removeChild(canvas);
+        confettiActive = false;
+        return;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      var globalAlpha = elapsed > fadeStart
+        ? 1 - (elapsed - fadeStart) / (duration - fadeStart)
+        : 1;
+
+      for (var i = 0; i < particles.length; i++) {
+        var p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.1;
+        p.vx *= 0.99;
+        p.rotation += p.rotationSpeed;
+        p.x += Math.sin(elapsed * 0.002 + p.wobbleOffset) * 0.5;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation * Math.PI / 180);
+        ctx.globalAlpha = globalAlpha;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  // ------------------------------------------
   // Envelope Animation
   // ------------------------------------------
   function initEnvelopeAnimation() {
@@ -69,16 +154,37 @@
     if (!flap || !letter || !envelope) return;
 
     var getEnvelopeH = function() { return envelope.offsetHeight; };
+    var mobile = isMobile();
 
-    var tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: isMobile() ? '.panel-envelope' : '.scroll-container',
-        start: 'top top',
-        end: '+=150',
-        scrub: 0.3,
-        invalidateOnRefresh: true,
-      },
-    });
+    var confettiTriggered = false;
+    var onEnvelopeUpdate = function(self) {
+      if (self.progress >= 0.95 && !confettiTriggered) {
+        confettiTriggered = true;
+        launchConfetti();
+      }
+      if (self.progress < 0.5) {
+        confettiTriggered = false;
+      }
+    };
+
+    var stConfig = mobile ? {
+      trigger: '.panel-envelope',
+      start: 'top top',
+      end: '+=150',
+      scrub: 0.3,
+      invalidateOnRefresh: true,
+      onUpdate: onEnvelopeUpdate,
+    } : {
+      trigger: '.panel-envelope',
+      start: 'left left',
+      end: '20% left',
+      scrub: 0.3,
+      invalidateOnRefresh: true,
+      containerAnimation: horizontalAnimation,
+      onUpdate: onEnvelopeUpdate,
+    };
+
+    var tl = gsap.timeline({ scrollTrigger: stConfig });
 
     tl.to(indicator, { opacity: 0, duration: 0.05 }, 0);
 
@@ -226,60 +332,68 @@
         ? parseInt(form.querySelector('#rsvp-guests').value, 10)
         : 0;
 
-      var data = {
-        name: name,
-        email: email,
-        attending: attending.value,
-        guests: guests,
-        timestamp: new Date().toISOString(),
+      var attendingText = attending.value === 'yes' ? 'Sí, asistirá' : 'No asistirá';
+      var guestLabel = guests > 0 ? guests + ' acompañante' + (guests > 1 ? 's' : '') : 'Sin acompañantes';
+
+      // Deshabilitar botón mientras se envía
+      var submitBtn = form.querySelector('.btn-submit');
+      var originalBtnText = submitBtn.textContent;
+      submitBtn.textContent = 'Enviando...';
+      submitBtn.disabled = true;
+
+      // Enviar al email via FormSubmit.co
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'https://formsubmit.co/ajax/pablovillalonga1@gmail.com', true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.setRequestHeader('Accept', 'application/json');
+
+      xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          // Guardar en localStorage como respaldo
+          var rsvps = JSON.parse(localStorage.getItem('wedding-rsvps') || '[]');
+          rsvps.push({ name: name, email: email, attending: attending.value, guests: guests, timestamp: new Date().toISOString() });
+          localStorage.setItem('wedding-rsvps', JSON.stringify(rsvps));
+
+          // Mostrar éxito
+          form.style.display = 'none';
+
+          if (attending.value === 'yes') {
+            var guestText = guests > 0
+              ? ' con ' + guests + ' acompañante' + (guests > 1 ? 's' : '')
+              : '';
+            successText.textContent =
+              name + ', hemos registrado tu confirmación' + guestText + '. ¡Nos vemos en la boda!';
+          } else {
+            successText.textContent =
+              name + ', lamentamos que no puedas asistir. ¡Te echaremos de menos!';
+          }
+
+          successEl.style.display = 'block';
+          gsap.from(successEl, { y: 20, opacity: 0, duration: 0.5 });
+        } else {
+          submitBtn.textContent = originalBtnText;
+          submitBtn.disabled = false;
+          showError('error-name', 'Hubo un error al enviar. Por favor, inténtalo de nuevo.');
+        }
       };
 
-      // Enviar datos via AJAX al servidor (si hay endpoint)
-      sendRSVPData(data);
+      xhr.onerror = function() {
+        submitBtn.textContent = originalBtnText;
+        submitBtn.disabled = false;
+        showError('error-name', 'Error de conexión. Por favor, inténtalo de nuevo.');
+      };
 
-      // Guardar en localStorage como respaldo
-      var rsvps = JSON.parse(localStorage.getItem('wedding-rsvps') || '[]');
-      rsvps.push(data);
-      localStorage.setItem('wedding-rsvps', JSON.stringify(rsvps));
-
-      form.style.display = 'none';
-
-      if (attending.value === 'yes') {
-        var guestText = guests > 0
-          ? ' con ' + guests + ' acompañante' + (guests > 1 ? 's' : '')
-          : '';
-        successText.textContent =
-          name + ', hemos registrado tu confirmación' + guestText + '. ¡Nos vemos en la boda!';
-      } else {
-        successText.textContent =
-          name + ', lamentamos que no puedas asistir. ¡Te echaremos de menos!';
-      }
-
-      successEl.style.display = 'block';
-      gsap.from(successEl, { y: 20, opacity: 0, duration: 0.5 });
+      xhr.send(JSON.stringify({
+        Nombre: name,
+        Email: email,
+        Asistencia: attendingText,
+        'Acompañantes': guestLabel,
+        _subject: 'RSVP Boda: ' + name + ' - ' + attendingText,
+        _template: 'table',
+      }));
     });
 
     initialized.rsvp = true;
-  }
-
-  // ------------------------------------------
-  // AJAX: Enviar RSVP al servidor
-  // ------------------------------------------
-  function sendRSVPData(data) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'api/rsvp.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onload = function() {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        console.log('RSVP enviado correctamente al servidor');
-      } else {
-        console.warn('Error al enviar RSVP al servidor, guardado en localStorage');
-      }
-    };
-    xhr.onerror = function() {
-      console.warn('Sin conexión al servidor, RSVP guardado en localStorage');
-    };
-    xhr.send(JSON.stringify(data));
   }
 
   // ------------------------------------------
