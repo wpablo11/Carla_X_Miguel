@@ -103,6 +103,7 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  opacity: 0;
 }
 
 .letter-photo {
@@ -119,7 +120,7 @@ body {
   left: 0;
   right: 0;
   height: 60%;
-  background-color: var(--rosa-palo);
+  background-color: var(--champan);
   border-radius: 0 0 4px 4px;
   clip-path: polygon(0 40%, 50% 0, 100% 40%, 100% 100%, 0 100%);
   z-index: 3;
@@ -174,10 +175,10 @@ body {
 .envelope-flap {
   width: 100%;
   height: 100%;
-  background-color: var(--rosa-palo);
+  background-color: var(--champan);
   clip-path: polygon(0 0, 50% 100%, 100% 0);
   transform-origin: top center;
-  backface-visibility: hidden;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.2));
 }
 
 /* Scroll indicator */

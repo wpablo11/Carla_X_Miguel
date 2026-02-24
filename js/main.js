@@ -191,6 +191,7 @@
     tl.to(flap, { rotateX: -180, duration: 0.25 }, 0);
 
     tl.set(letter, { zIndex: 10 }, 0.2);
+    tl.to(letter, { opacity: 1, duration: 0.15 }, 0.2);
     tl.to(letter, {
       y: function() { return getEnvelopeH() * 0.85; },
       duration: 0.45,
