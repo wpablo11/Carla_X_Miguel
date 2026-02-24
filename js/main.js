@@ -158,7 +158,7 @@
 
     var confettiTriggered = false;
     var onEnvelopeUpdate = function(self) {
-      if (self.progress >= 0.95 && !confettiTriggered) {
+      if (self.progress >= 0.95 && !confettiTriggered && self.direction > 0) {
         confettiTriggered = true;
         launchConfetti();
       }
@@ -237,7 +237,7 @@
           scrollTrigger: {
             trigger: el,
             start: isMobile() ? 'top 85%' : 'left 80%',
-            toggleActions: 'play none none none',
+            toggleActions: 'play none none reset',
             containerAnimation: isMobile() ? undefined : horizontalAnimation,
           },
         }
@@ -268,7 +268,7 @@
           scrollTrigger: {
             trigger: row,
             start: isMobile() ? 'top 85%' : 'left 80%',
-            toggleActions: 'play none none none',
+            toggleActions: 'play none none reset',
             containerAnimation: isMobile() ? undefined : horizontalAnimation,
           },
         }
